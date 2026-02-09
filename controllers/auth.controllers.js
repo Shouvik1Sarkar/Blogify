@@ -1,3 +1,5 @@
+import ApiError from "../utils/ApiError.utils.js";
+import { ApiResponse } from "../utils/ApiResponse.utils.js";
 export function reigsterUser(req, res) {
   const { fullName, userName, email, password } = req.body;
 
@@ -6,8 +8,8 @@ export function reigsterUser(req, res) {
       (field) => !field || field?.trim() === "",
     )
   ) {
-    throw new Error("This is error.");
+    throw new ApiError(500, "This is error.");
   }
 
-  return res.send("This is it.");
+  return res.status(200).json(new ApiResponse(200, null, "This is it"));
 }
