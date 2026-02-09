@@ -8,7 +8,7 @@ export function reigsterUser(req, res) {
       (field) => !field || field?.trim() === "",
     )
   ) {
-    throw new ApiError(500, "This is error.");
+    throw new ApiError(400, "All the credentials are required.");
   }
 
   return res.status(200).json(new ApiResponse(200, null, "This is it"));
