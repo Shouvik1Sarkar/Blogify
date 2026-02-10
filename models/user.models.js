@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 const userSchema = new mongoose.Schema(
   {
@@ -77,6 +79,43 @@ userSchema.pre("save", async function () {
 
 userSchema.methods.comparePassword = async function (userPassword) {
   return await bcrypt.compare(userPassword, this.password);
+};
+
+userSchema.methods.generateAccessToken = async function () {
+  return await jwt.sign(
+    {
+      _id: this._id,
+      email: this.email,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    },
+  );
+};
+userSchema.methods.generateRefreshToken = async function () {
+  return await jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+    },
+  );
+};
+
+userSchema.methods.generateEmailVerificationToken = async function () {
+  const unhashedToken = await crypto.randomBytes(256).toString("hex");
+
+  const hashedToken = await crypto
+    .createHash("sha256")
+    .update(unhashedToken)
+    .digest("hex");
+
+  const expiresIn = Date.now() + 20 * 60 * 1000;
+
+  return { unhashedToken, hashedToken, expiresIn };
 };
 
 const User = mongoose.model("User", userSchema);
