@@ -20,6 +20,10 @@ const blogSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    playList: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PlayList",
+    },
 
     coverImage: {
       type: String,
