@@ -45,22 +45,34 @@ const userSchema = new mongoose.Schema(
       type: Date,
     },
 
-    accessToken: {},
-    accessTokenExpiresIn: {},
+    emailVerificationToken: {
+      type: String,
+    },
+    emailVerificationTokenExpiry: {
+      type: Date,
+    },
 
-    refreshToken: {},
-    refreshTokenExpiresIn: {},
+    accessToken: {
+      type: String,
+    },
+    accessTokenExpiresIn: {
+      type: Date,
+    },
+
+    refreshToken: {
+      type: String,
+    },
+    refreshTokenExpiresIn: {
+      type: Date,
+    },
   },
   { timestamps: true },
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified(this.password)) {
-    return next();
-  }
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
   this.password = await bcrypt.hash(this.password, 10);
-  return next();
 });
 
 userSchema.methods.comparePassword = async function (userPassword) {

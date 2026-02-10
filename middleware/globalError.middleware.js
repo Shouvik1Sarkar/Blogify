@@ -2,8 +2,6 @@ function globalError(err, req, res, next) {
   const error = { ...err };
 
   try {
-    console.log("====", error);
-    console.log("====", err);
     return res.status(err.statusCode || 500).json({
       statusCode: err.statusCode || 500,
       message: err.message || "Server error",

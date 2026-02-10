@@ -13,6 +13,8 @@ import globalError from "./middleware/globalError.middleware.js";
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // app.use()
 
 connect_db(MONGODB_URI);
