@@ -93,6 +93,7 @@ userSchema.methods.generateAccessToken = async function () {
     },
   );
 };
+
 userSchema.methods.generateRefreshToken = async function () {
   return await jwt.sign(
     {
