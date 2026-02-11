@@ -1,56 +1,52 @@
-// import { body } from "express-validator";
 import Mailgen from "mailgen";
-import nodemailer from "nodemailer";
+import ApiError from "./ApiError.utils";
+// Configure mailgen by setting a theme and your product info
 
-const sendMail = async (options) => {
+const enail = async (options) => {
   const mailGenerator = new Mailgen({
     theme: "default",
     product: {
-      name: "Task Manager",
+      name: "Blogify",
       link: "https://mailgen.js/",
     },
   });
-  // Generate an HTML email with the provided contents
   const emailBody = mailGenerator.generate(options.mailGenContent);
 
-  // Generate the plaintext version of the e-mail (for clients that do not support HTML)
   const emailText = mailGenerator.generatePlaintext(options.mailGenContent);
 
   const transporter = nodemailer.createTransport({
-    host: process.env.MAILTRAP_SMTP_HOST,
-    port: process.env.MAILTRAP_SMTP_PORT,
+    host: process.env.MAIL_TRAP_SMTP_HOST,
+    port: process.env.MAIL_TRAP_SMTP_PORT,
     secure: false, // Use true for port 465, false for port 587
     auth: {
-      user: process.env.MAILTRAP_SMTP_USER,
-      pass: process.env.MAILTRAP_SMTP_PASS,
+      user: process.env.MAIL_TRAP_SMTP_USER,
+      pass: process.env.MAIL_TRAP_SMTP_PASS,
     },
   });
 
-  const mail = {
-    from: "mail.test@gmail.com",
-    to: options.email,
-    subject: options.subject,
-    text: emailText, // Plain-text version of the message
-    html: emailBody, // HTML version of the message
-  };
-
   try {
-    await transporter.sendMail(mail);
+    await transporter.sendMail({
+      from: '"Maddison Foo Koch" <maddison53@ethereal.email>',
+      to: options.email,
+      subject: options.subject || "subject",
+      text: emailText, // Plain-text version of the message
+      html: emailBody, // HTML version of the message
+    });
   } catch (error) {
-    console.error("ERROR NODE MIALER MAIL SENDING", error);
+    throw new ApiError(500, error.message || "ERROR", error);
   }
 };
 
-const emailVerificationMailContent = (userName, verificationUrl) => {
+const emailVerificationMail = async (userName, verificationUrl) => {
   return {
     body: {
       name: userName,
-      intro: "Welcome to app! We're very excited to have you on board.",
+      intro: "Welcome to Blogify! We're very excited to have you on board.",
       action: {
-        instructions: "To get started with app, please click here:",
+        instructions: "To get started with Blogify, please click here:",
         button: {
           color: "#22BC66", // Optional action button color
-          text: "Verify your account",
+          text: "Confirm your account",
           link: verificationUrl,
         },
       },
@@ -59,17 +55,34 @@ const emailVerificationMailContent = (userName, verificationUrl) => {
     },
   };
 };
-const forgotPasswordMailContent = (userName, passwordResetUrl) => {
+const logInMail = async (userName) => {
   return {
     body: {
       name: userName,
-      intro: "RESET YOUR PASSWORD",
+      intro: "LogIn Alert",
       action: {
-        instructions: "To RESET please click here:",
+        instructions: "This is to inform you about your new logIn",
+        // button: {
+        //   color: "#22BC66", // Optional action button color
+        //   text: "Confirm your account",
+        //   link: verificationUrl,
+        // },
+      },
+      outro: "It was not you? Just reply to this email, we'd love to help.",
+    },
+  };
+};
+const forgotPasswordMail = async (userName, forgotPasswordUrl) => {
+  return {
+    body: {
+      name: userName,
+      intro: "Forgot Password",
+      action: {
+        instructions: "To get started with Blogify, please click here:",
         button: {
           color: "#22BC66", // Optional action button color
-          text: "resetPass",
-          link: passwordResetUrl,
+          text: "Confirm your account",
+          link: forgotPasswordUrl,
         },
       },
       outro:
