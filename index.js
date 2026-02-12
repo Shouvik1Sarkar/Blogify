@@ -1,5 +1,6 @@
 import express from "express";
 import { PORT, MONGODB_URI } from "./config/env.js";
+import cookieParser from "cookie-parser";
 
 // Import Variables
 
@@ -14,7 +15,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cookieParser());
 // app.use()
 
 connect_db(MONGODB_URI);

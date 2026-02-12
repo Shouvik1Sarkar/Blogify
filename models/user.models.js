@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { type } from "os";
 
 const userSchema = new mongoose.Schema(
   {
@@ -39,12 +40,9 @@ const userSchema = new mongoose.Schema(
       minLength: 4,
       maxLength: 25,
     },
-
-    emailVerificationToken: {
-      type: String,
-    },
-    emailVerificationTokenExpiry: {
-      type: Date,
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
     },
 
     emailVerificationToken: {
@@ -107,15 +105,18 @@ userSchema.methods.generateRefreshToken = async function () {
   );
 };
 
-userSchema.methods.generateEmailVerificationToken = async function () {
-  const unhashedToken = await crypto.randomBytes(256).toString("hex");
+userSchema.methods.generateEmailVerificationToken = function () {
+  const unhashedToken = crypto.randomBytes(256).toString("hex");
 
-  const hashedToken = await crypto
+  const hashedToken = crypto
     .createHash("sha256")
     .update(unhashedToken)
     .digest("hex");
 
   const expiresIn = Date.now() + 20 * 60 * 1000;
+  // Save to user document
+  this.emailVerificationToken = hashedToken;
+  this.emailVerificationExpiry = expiresIn;
 
   return { unhashedToken, hashedToken, expiresIn };
 };

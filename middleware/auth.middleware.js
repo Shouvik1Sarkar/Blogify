@@ -5,7 +5,7 @@ import User from "../models/user.models.js";
 
 async function authMiddleware(req, res, next) {
   const cookieToken = req.cookies?.accessToken;
-
+  console.log("COOKIES:---- ", cookieToken);
   if (!cookieToken) {
     throw new ApiError(500, "Not loggedIn cookie not here");
   }
