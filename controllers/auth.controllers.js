@@ -65,15 +65,15 @@ export async function validateEmail(req, res) {
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
   console.log("HASHED tOKEN", hashedToken);
 
-  const user = await User.findOne({
-    emailVerificationToken: hashedToken,
-  });
   // const user = await User.findOne({
-  //   $and: [
-  //     { emailVerificationToken: hashedToken },
-  //     { emailVerificationTokenExpiry: { $gt: Date.now() } },
-  //   ],
+  //   emailVerificationToken: hashedToken,
   // });
+  const user = await User.findOne({
+    $and: [
+      { emailVerificationToken: hashedToken },
+      { emailVerificationTokenExpiry: { $gt: Date.now() } },
+    ],
+  });
   if (!user) {
     throw new ApiError(500, "User not found");
   }
@@ -104,16 +104,41 @@ export const logInUser = asyncHandler(async (req, res) => {
   user.accessToken = accessToken;
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
-
+  const options = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 60 * 60 * 1000, // 60 minutes
+  };
   return res
     .status(200)
-    .cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000, // 15 minutes
-    })
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken)
     .json(new ApiResponse(200, user, "USER LOGGEDIN"));
+});
+
+export const logOutUser = asyncHandler(async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    throw new ApiError(500, "User Not found");
+  }
+
+  const loggedOutUser = await User.findOneAndUpdate(user._id, {
+    $unset: {
+      accessToken: 1,
+      refreshToken: 1,
+      refreshTokenExpiry: 1,
+      accessTokenExpiresIn: 1,
+    },
+  });
+
+  await loggedOutUser.save({ validateBeforeSave: false });
+
+  return res
+    .status(201)
+    .clearCookie("accessToken")
+    .clearCookie("refreshToken")
+    .json(new ApiResponse(200, loggedOutUser, "User Logged Out"));
 });
 
 export const getUser = asyncHandler(async (req, res) => {
