@@ -1,8 +1,10 @@
 import Mailgen from "mailgen";
-import ApiError from "./ApiError.utils";
+import ApiError from "./ApiError.utils.js";
+import nodemailer from "nodemailer";
+
 // Configure mailgen by setting a theme and your product info
 
-const enail = async (options) => {
+const emailSend = async (options) => {
   const mailGenerator = new Mailgen({
     theme: "default",
     product: {
@@ -26,7 +28,7 @@ const enail = async (options) => {
 
   try {
     await transporter.sendMail({
-      from: '"Maddison Foo Koch" <maddison53@ethereal.email>',
+      from: process.env.MAIL_TRAP_SMTP_SENDER,
       to: options.email,
       subject: options.subject || "subject",
       text: emailText, // Plain-text version of the message
@@ -90,3 +92,5 @@ const forgotPasswordMail = async (userName, forgotPasswordUrl) => {
     },
   };
 };
+
+export { emailSend, emailVerificationMail, logInMail, forgotPasswordMail };

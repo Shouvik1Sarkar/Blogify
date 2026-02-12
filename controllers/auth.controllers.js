@@ -1,6 +1,14 @@
 import User from "../models/user.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
+
+import {
+  emailSend,
+  emailVerificationMail,
+  logInMail,
+  forgotPasswordMail,
+} from "../utils/mail.js";
+
 export async function reigsterUser(req, res) {
   const { fullName, userName, email, password } = req.body;
 
@@ -30,6 +38,18 @@ export async function reigsterUser(req, res) {
   if (!user) {
     throw new ApiError(400, "User not created ");
   }
+
+  const verification_url = "this_is_an_url";
+  const mailGenContent = await emailVerificationMail(
+    user.userName,
+    verification_url,
+  );
+
+  await emailSend({
+    email: user.email,
+    subject: "This is subject",
+    mailGenContent,
+  });
 
   return res
     .status(200)
