@@ -74,7 +74,7 @@ const logInMail = async (userName) => {
     },
   };
 };
-const forgotPasswordMail = async (userName, forgotPasswordUrl) => {
+const forgotPasswordMail = async (userName, forgotPasswordOTP) => {
   return {
     body: {
       name: userName,
@@ -83,8 +83,8 @@ const forgotPasswordMail = async (userName, forgotPasswordUrl) => {
         instructions: "To get started with Blogify, please click here:",
         button: {
           color: "#22BC66", // Optional action button color
-          text: "Confirm your account",
-          link: forgotPasswordUrl,
+          text: forgotPasswordOTP,
+          // link: forgotPasswordUrl,
         },
       },
       outro:
