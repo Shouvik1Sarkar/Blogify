@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  getUser,
   logInUser,
   logOutUser,
   reigsterUser,
@@ -18,7 +17,7 @@ authRouter
 authRouter.route("/validate/:token").get(validateEmail);
 
 authRouter.route("/logIn").post(logInUser);
-authRouter.get("/get", authMiddleware, getUser);
+
 authRouter.get("/logOut", authMiddleware, logOutUser);
 
 export default authRouter;

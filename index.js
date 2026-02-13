@@ -5,11 +5,15 @@ import cookieParser from "cookie-parser";
 // Import Variables
 
 import connect_db from "./connection/db.js";
-import authRouter from "./routes/auth.routes.js";
 
 // global middlewares
 
 import globalError from "./middleware/globalError.middleware.js";
+
+// import routes
+
+import authRouter from "./routes/auth.routes.js";
+import userRouter from "./routes/user.routes.js";
 
 const app = express();
 
@@ -23,6 +27,7 @@ connect_db(MONGODB_URI);
 app.get("/", (req, res) => res.send("THIS IS IT"));
 
 app.use("/api/v1/auth/", authRouter);
+app.use("/api/v1/user/", userRouter);
 
 app.use(globalError);
 

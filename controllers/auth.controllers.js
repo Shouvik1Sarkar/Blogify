@@ -141,12 +141,4 @@ export const logOutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, loggedOutUser, "User Logged Out"));
 });
 
-export const getUser = asyncHandler(async (req, res) => {
-  const user = req.user;
-  console.log("USER: ", user);
-  if (!user) {
-    throw new ApiError(500, "NOT LOGGEDIN");
-  }
 
-  return res.status(200).json(new ApiResponse(200, user, "THIS IS USER"));
-});
