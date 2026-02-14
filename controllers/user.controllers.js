@@ -62,3 +62,54 @@ export const resetForgottenPassword = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(201, user, "Password updated successfully"));
 });
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  const { password } = req.body;
+
+  if (!password) {
+    throw new ApiError(500, "PASSWORD IS REQUIROED");
+  }
+
+  const user = req.user;
+
+  const isPasswordCoreect = await user.comparePassword(password);
+
+  if (!isPasswordCoreect) {
+    throw new ApiError(500, "Password did not match");
+  }
+
+  const forgotToken = Math.floor(Math.random() * 1000000) + 100000;
+
+  //   forgotPasswordMail(user.userName, forgotToken);
+  user.resetToken = forgotToken;
+  user.resetTokenExpiry = Date.now() + 20 * 60 * 1000;
+
+  await user.save({ validateBeforeSave: false });
+
+  console.log("OTP: ", forgotToken);
+
+  return res.status(201).json(new ApiResponse(201, user, "OTP SENT"));
+});
+
+export const changePassword = asyncHandler(async (req, res) => {
+  const { newPassword, confirmNewPassword } = req.body;
+
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(500, "NOT LOGGED IN");
+  }
+
+  if (newPassword !== confirmNewPassword) {
+    throw new ApiError(500, "Passwords did not match");
+  }
+
+  user.password = newPassword;
+  console.log("0000000000000000", user.userName);
+
+  await user.save();
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, user, "Password updated successfully"));
+});
