@@ -17,21 +17,5 @@ import {
 const userRouter = express.Router();
 
 userRouter.route("/get").get(authMiddleware, getUser);
-userRouter.route("/forgotPassword").post(forgotPassword);
-userRouter
-  .route("/resetForgottenPassword")
-  .post(
-    resetForgotPasswordValidation(),
-    validateMiddleware,
-    resetForgottenPassword,
-  );
-userRouter.route("/resetPassword").post(authMiddleware, resetPassword);
-userRouter
-  .route("/changePassword")
-  .post(
-    resetForgotPasswordValidation(),
-    validateMiddleware,
-    authMiddleware,
-    changePassword,
-  );
+
 export default userRouter;

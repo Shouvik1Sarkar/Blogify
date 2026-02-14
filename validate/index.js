@@ -75,7 +75,7 @@ function logInValidation() {
   ];
 }
 
-function resetForgotPasswordValidation() {
+function changeForgotPasswordValidation() {
   return [
     body("newPassword")
       .trim()
@@ -94,4 +94,4 @@ function resetForgotPasswordValidation() {
   ];
 }
 
-export { registrationValidation, resetForgotPasswordValidation };
+export { registrationValidation, changeForgotPasswordValidation };
