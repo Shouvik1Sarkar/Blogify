@@ -44,3 +44,33 @@ export const getAllBlogs = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, allBlogs, "All Blogs are here."));
 });
+export const getUserBlogs = asyncHandler(async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    throw new ApiError(500, "User Not Logged In");
+  }
+
+  const allBlogs = await Blog.find({
+    createdBy: user._id,
+  });
+
+  if (!allBlogs) {
+    throw new ApiError(500, "blogs not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, allBlogs, "All Blogs are here."));
+});
+
+export const getBlog = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const blog = await Blog.findById(id);
+
+  if (!blog) {
+    throw new ApiError(500, "Blog not found");
+  }
+
+  return res.status(200).json(new ApiResponse(200, blog, "BLOG"));
+});
