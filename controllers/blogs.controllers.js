@@ -2,6 +2,7 @@ import Blog from "../models/blog.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
+import { available_roles } from "../utils/constants.utils.js";
 
 export const createBlog = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -22,4 +23,24 @@ export const createBlog = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(new ApiResponse(201, createsBlog, "Blog created"));
+});
+
+export const getAllBlogs = asyncHandler(async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    throw new ApiError(500, "User Not Logged In");
+  }
+  const user_role = user.role;
+  if (user_role !== available_roles.admin) {
+    throw new ApiError(500, "You are not authorized to get all the blogs");
+  }
+  const allBlogs = await Blog.find();
+
+  if (!allBlogs) {
+    throw new ApiError(500, "All Blogs are here");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, allBlogs, "All Blogs are here."));
 });

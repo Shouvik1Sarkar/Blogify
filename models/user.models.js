@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { type } from "os";
+import {
+  available_roles,
+  available_roles_enum,
+} from "../utils/constants.utils.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -48,6 +53,11 @@ const userSchema = new mongoose.Schema(
     bio: {
       type: String,
       default: "No Bio",
+    },
+    role: {
+      type: String,
+      enum: available_roles_enum,
+      default: available_roles.member,
     },
 
     emailVerificationToken: {
