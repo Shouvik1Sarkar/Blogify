@@ -39,7 +39,6 @@ export async function reigsterUser(req, res) {
   }
   const { unhashedToken, hashedToken, expiresIn } =
     user.generateEmailVerificationToken();
-  console.log("VERIFICATION URL", unhashedToken);
 
   await user.save({ validateBeforeSave: false });
   const verification_url = `http://localhost:5500/api/v1/auth/validate/${unhashedToken}`;
@@ -48,11 +47,15 @@ export async function reigsterUser(req, res) {
     verification_url,
   );
 
+  console.log("VERIFICATION URL", verification_url);
   await emailSend({
     email: user.email,
     subject: "This is subject",
     mailGenContent,
   });
+
+  console.log("-----", user.emailVerificationToken);
+  console.log("-----", user.emailVerificationTokenExpiry);
 
   return res
     .status(200)
@@ -79,6 +82,8 @@ export async function validateEmail(req, res) {
   }
 
   user.isEmailVerified = true;
+  user.emailVerificationToken = undefined;
+  user.emailVerificationTokenExpiry = undefined;
   await user.save({ validateBeforeSave: false });
   return res.status(200).json(new ApiResponse(200, user, "USER VERIFIED"));
 }
@@ -87,7 +92,7 @@ export const logInUser = asyncHandler(async (req, res) => {
   const { userName, email, password } = req.body;
   const user = await User.findOne({
     $or: [{ userName }, { email }],
-  });
+  }).select("+password");
 
   if (!user) {
     throw new ApiError(500, "User not found");
@@ -104,17 +109,20 @@ export const logInUser = asyncHandler(async (req, res) => {
   user.accessToken = accessToken;
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
+
   const options = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     maxAge: 60 * 60 * 1000, // 60 minutes
   };
+  const userObj = user.toObject();
+  delete userObj.password;
   return res
     .status(200)
     .cookie("accessToken", accessToken, options)
     .cookie("refreshToken", refreshToken)
-    .json(new ApiResponse(200, user, "USER LOGGEDIN"));
+    .json(new ApiResponse(200, userObj, "USER LOGGEDIN"));
 });
 
 export const logOutUser = asyncHandler(async (req, res) => {
@@ -123,7 +131,7 @@ export const logOutUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "User Not found");
   }
 
-  const loggedOutUser = await User.findOneAndUpdate(user._id, {
+  const loggedOutUser = await User.findByIdAndUpdate(user._id, {
     $unset: {
       accessToken: 1,
       refreshToken: 1,
@@ -152,7 +160,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     throw new ApiError(500, "User Not Found");
   }
 
-  const forgotToken = Math.floor(Math.random() * 1000000) + 100000;
+  const forgotToken = crypto.randomInt(100000, 999999);
 
   forgotPasswordMail(user.userName, forgotToken);
   user.forgotToken = forgotToken;
@@ -208,14 +216,16 @@ export const resetPasswordSendOtp = asyncHandler(async (req, res) => {
   }
 
   const user = req.user;
+  console.log("USER: ", user);
 
   const isPasswordCoreect = await user.comparePassword(password);
+  console.log("(((((((((((", isPasswordCoreect);
 
   if (!isPasswordCoreect) {
     throw new ApiError(500, "Password did not match");
   }
 
-  const forgotToken = Math.floor(Math.random() * 1000000) + 100000;
+  const forgotToken = crypto.randomInt(100000, 999999);
 
   //   forgotPasswordMail(user.userName, forgotToken);
   user.resetToken = forgotToken;

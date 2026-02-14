@@ -39,6 +39,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minLength: 4,
       maxLength: 25,
+      select: false,
     },
     isEmailVerified: {
       type: Boolean,
@@ -129,7 +130,7 @@ userSchema.methods.generateEmailVerificationToken = function () {
   const expiresIn = Date.now() + 20 * 60 * 1000;
   // Save to user document
   this.emailVerificationToken = hashedToken;
-  this.emailVerificationExpiry = expiresIn;
+  this.emailVerificationTokenExpiry = expiresIn;
 
   return { unhashedToken, hashedToken, expiresIn };
 };
