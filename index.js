@@ -14,6 +14,7 @@ import globalError from "./middleware/globalError.middleware.js";
 
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
+import blogRouter from "./routes/blogs.routes.js";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.get("/", (req, res) => res.send("THIS IS IT"));
 
 app.use("/api/v1/auth/", authRouter);
 app.use("/api/v1/user/", userRouter);
+app.use("/api/v1/blog/", blogRouter);
 
 app.use(globalError);
 
