@@ -103,3 +103,22 @@ export const comment = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, commentIt, "Comment added"));
 });
+
+export const commentOfABlog = asyncHandler(async (req, res) => {
+  const { blogId } = req.params;
+
+  if (!blogId) {
+    throw new ApiError(500, "BLOG ID NOT FOUND");
+  }
+
+  const allComments = await Comments.find({
+    blog: blogId,
+  });
+
+  if (!allComments) {
+    throw new ApiError(500, "Comments not found");
+  }
+  return res
+    .status(200)
+    .json(new ApiResponse(200, allComments, "All comments are here."));
+});
