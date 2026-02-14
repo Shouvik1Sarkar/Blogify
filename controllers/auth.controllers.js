@@ -168,8 +168,16 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 export const changeForgottenPassword = asyncHandler(async (req, res) => {
   const { forgotToken, newPassword, confirmNewPassword } = req.body;
 
+  const hashedForgotToken = crypto
+    .createHash("sha256")
+    .update(forgotToken)
+    .digest("hex");
+
   const user = await User.findOne({
-    $and: [{ forgotToken }, { forgotTokenExpiry: { $gt: Date.now() } }],
+    $and: [
+      { forgotToken: hashedForgotToken },
+      { forgotTokenExpiry: { $gt: Date.now() } },
+    ],
   });
 
   if (!user) {
@@ -181,6 +189,8 @@ export const changeForgottenPassword = asyncHandler(async (req, res) => {
   }
 
   user.password = newPassword;
+  user.forgotToken = undefined;
+  user.forgotTokenExpiry = undefined;
   console.log("0000000000000000", user.userName);
 
   await user.save();
@@ -232,6 +242,8 @@ export const resetPassword = asyncHandler(async (req, res) => {
   }
 
   user.password = newPassword;
+  user.resetToken = undefined;
+  user.resetTokenExpiry = undefined;
   console.log("0000000000000000", user.userName);
 
   await user.save();

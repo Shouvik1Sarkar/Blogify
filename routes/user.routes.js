@@ -1,18 +1,8 @@
 import express from "express";
 
-import {
-  registrationValidation,
-  resetForgotPasswordValidation,
-} from "../validate/index.js";
 import validateMiddleware from "../middleware/validators.middlewares.js";
 import authMiddleware from "../middleware/auth.middleware.js";
-import {
-  changePassword,
-  forgotPassword,
-  getUser,
-  resetForgottenPassword,
-  resetPassword,
-} from "../controllers/user.controllers.js";
+import { getUser } from "../controllers/user.controllers.js";
 
 const userRouter = express.Router();
 

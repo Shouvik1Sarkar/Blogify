@@ -134,6 +134,24 @@ userSchema.methods.generateEmailVerificationToken = function () {
   return { unhashedToken, hashedToken, expiresIn };
 };
 
+userSchema.pre("save", async function () {
+  if (!this.isModified("forgotToken") || !this.forgotToken) return;
+
+  this.forgotToken = crypto
+    .createHash("sha256")
+    .update(this.forgotToken)
+    .digest("hex");
+});
+
+userSchema.pre("save", async function () {
+  if (!this.isModified("resetToken") || !this.resetToken) return;
+
+  this.resetToken = crypto
+    .createHash("sha256")
+    .update(this.resetToken)
+    .digest("hex");
+});
+
 const User = mongoose.model("User", userSchema);
 
 export default User;

@@ -1,12 +1,13 @@
 import express from "express";
 import {
+  resetPassword,
   changeForgottenPassword,
-  changePassword,
   logInUser,
   logOutUser,
   reigsterUser,
   resetPasswordSendOtp,
   validateEmail,
+  forgotPassword,
 } from "../controllers/auth.controllers.js";
 import {
   changeForgotPasswordValidation,
@@ -41,7 +42,7 @@ authRouter
     changeForgotPasswordValidation(),
     validateMiddleware,
     authMiddleware,
-    changePassword,
+    resetPassword,
   );
 
 export default authRouter;
