@@ -1,3 +1,5 @@
+import Blog from "../models/blog.models.js";
+import PlayList from "../models/playList.models.js";
 import User from "../models/user.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
@@ -41,6 +43,22 @@ export const updateProfile = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, updatedUser, "User Updated"));
+});
+
+export const deleteProfile = asyncHandler(async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    throw new ApiError(500, "not found User.");
+  }
+  const deleteUser = await User.findByIdAndDelete(user._id);
+  await Blog.deleteMany({ createdBy: user._id });
+  await PlayList.deleteMany({ createdBy: user._id });
+
+  return res
+    .status(200)
+    .clearCookie("accessToken")
+    .clearCookie("refreshToken")
+    .json(new ApiResponse(200, null, "deleted"));
 });
 
 // export const forgotPassword = asyncHandler(async (req, res) => {
