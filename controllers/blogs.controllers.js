@@ -74,3 +74,10 @@ export const getBlog = asyncHandler(async (req, res) => {
 
   return res.status(200).json(new ApiResponse(200, blog, "BLOG"));
 });
+export const deleteBlog = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  await Blog.findByIdAndDelete(id);
+
+  return res.status(200).json(new ApiResponse(200, null, "BLOG deleted"));
+});
