@@ -3,6 +3,7 @@ import ApiError from "../utils/ApiError.utils.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 import { available_roles } from "../utils/constants.utils.js";
+import Comments from "../models/comments.models.js";
 
 export const createBlog = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -80,4 +81,25 @@ export const deleteBlog = asyncHandler(async (req, res) => {
   await Blog.findByIdAndDelete(id);
 
   return res.status(200).json(new ApiResponse(200, null, "BLOG deleted"));
+});
+
+export const comment = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const { blogId } = req.params;
+  const { comment } = req.body;
+  console.log("COMMENT: ", comment);
+
+  const commentIt = await Comments.create({
+    createBy: user._id,
+    comment,
+    blog: blogId,
+  });
+
+  if (!commentIt) {
+    throw new ApiError(500, "Comment not created");
+  }
+
+  console.log("XXXXXXXXXXXXXXXXXXXXX", commentIt);
+
+  return res.status(200).json(new ApiResponse(200, commentIt, "Comment added"));
 });

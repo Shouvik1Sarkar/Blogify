@@ -1,6 +1,7 @@
 import { Router } from "express";
 import authMiddleware from "../middleware/auth.middleware.js";
 import {
+  comment,
   createBlog,
   deleteBlog,
   getAllBlogs,
@@ -19,5 +20,7 @@ blogRouter.route("/getAllBlogs").get(authMiddleware, getAllBlogs);
 blogRouter.route("/getUserBlogs").get(authMiddleware, getUserBlogs);
 blogRouter.route("/getBlog/:id").get(getBlog);
 blogRouter.route("/deleteBlog/:id").delete(deleteBlog);
+
+blogRouter.route("/:blogId/comment/").post(authMiddleware, comment);
 
 export default blogRouter;
