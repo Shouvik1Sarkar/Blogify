@@ -14,6 +14,35 @@ export const getUser = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, user, "THIS IS USER"));
 });
 
+export const updateProfile = asyncHandler(async (req, res) => {
+  const { userName, bio } = req.body;
+  const user = req.user;
+
+  const profileObject = {};
+
+  if (userName !== undefined) profileObject.userName = userName;
+  if (bio !== undefined) profileObject.bio = bio;
+
+  const existedUser = await User.findOne({ userName });
+  if (existedUser) {
+    throw new ApiError(500, "User Name already exists");
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    user._id,
+    {
+      $set: profileObject,
+    },
+    {
+      new: true,
+    },
+  );
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, updatedUser, "User Updated"));
+});
+
 // export const forgotPassword = asyncHandler(async (req, res) => {
 //   const { userName, email } = req.body;
 

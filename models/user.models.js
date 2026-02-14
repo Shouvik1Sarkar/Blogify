@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { type } from "os";
 
 const userSchema = new mongoose.Schema(
   {
@@ -44,6 +43,11 @@ const userSchema = new mongoose.Schema(
     isEmailVerified: {
       type: Boolean,
       default: false,
+    },
+
+    bio: {
+      type: String,
+      default: "No Bio",
     },
 
     emailVerificationToken: {
