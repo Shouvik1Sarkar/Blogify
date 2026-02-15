@@ -16,6 +16,7 @@ import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.routes.js";
 import blogRouter from "./routes/blogs.routes.js";
 import commentRouter from "./routes/comment.routes.js";
+import likesRoutes from "./routes/likes.routes.js";
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use("/api/v1/auth/", authRouter);
 app.use("/api/v1/user/", userRouter);
 app.use("/api/v1/blog/", blogRouter);
 app.use("/api/v1/comment/", commentRouter);
+app.use("/api/v1/like/", likesRoutes);
 
 app.use(globalError);
 
