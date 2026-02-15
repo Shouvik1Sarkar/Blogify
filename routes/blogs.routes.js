@@ -8,6 +8,7 @@ import {
   getAllBlogs,
   getBlog,
   getUserBlogs,
+  updateComment,
 } from "../controllers/blogs.controllers.js";
 import { createBlogValidation } from "../validate/blogs.validate.js";
 import validateMiddleware from "../middleware/validators.middlewares.js";
@@ -22,9 +23,13 @@ blogRouter.route("/getUserBlogs").get(authMiddleware, getUserBlogs);
 blogRouter.route("/getBlog/:id").get(getBlog);
 blogRouter.route("/deleteBlog/:id").delete(deleteBlog);
 
+// comment
+
 blogRouter.route("/:blogId/comment/").post(authMiddleware, comment);
 blogRouter
   .route("/commentOfABlog/:blogId/")
   .get(authMiddleware, commentOfABlog);
+ 
+
 
 export default blogRouter;

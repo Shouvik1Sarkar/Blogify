@@ -122,3 +122,38 @@ export const commentOfABlog = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, allComments, "All comments are here."));
 });
+
+export const updateComment = asyncHandler(async (req, res) => {
+  const { commentId } = req.params;
+  const { newComment } = req.body;
+
+  const user = req.user;
+
+  console.log("09090909", user._id);
+
+  if (!commentId) {
+    throw new ApiError(400, "Comment ID is required");
+  }
+
+  const comment = await Comments.findOneAndUpdate(
+    {
+      _id: commentId,
+      createBy: user._id,
+    },
+    {
+      $set: { comment: newComment },
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+
+  if (!comment) {
+    throw new ApiError(404, "Comment not found or unauthorized");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, comment, "Comment updated successfully"));
+});
