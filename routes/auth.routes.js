@@ -15,12 +15,18 @@ import {
 } from "../validate/index.js";
 import validateMiddleware from "../middleware/validators.middlewares.js";
 import authMiddleware from "../middleware/auth.middleware.js";
+import upload from "../middleware/multer.middleware.js";
 
 const authRouter = express.Router();
 
 authRouter
   .route("/register")
-  .post(registrationValidation(), validateMiddleware, reigsterUser);
+  .post(
+    upload.single("cover_image"),
+    registrationValidation(),
+    validateMiddleware,
+    reigsterUser,
+  );
 authRouter.route("/validate/:token").get(validateEmail);
 
 authRouter.route("/logIn").post(logInUser);

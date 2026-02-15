@@ -25,6 +25,9 @@ const userSchema = new mongoose.Schema(
       minLength: 6,
       maxLength: 25,
     },
+    cover_image: {
+      type: String,
+    },
 
     email: {
       type: String,

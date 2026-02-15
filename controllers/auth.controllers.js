@@ -10,9 +10,17 @@ import {
   forgotPasswordMail,
 } from "../utils/mail.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
+import uploadImage from "../utils/cloudinaary.utils.js";
 
 export async function reigsterUser(req, res) {
   const { fullName, userName, email, password } = req.body;
+  const cover_image = req.file?.path;
+
+  const uploadPath = await uploadImage(cover_image);
+
+  console.log("upload path", uploadPath);
+
+  console.log("***********", cover_image);
 
   const existedUser = await User.findOne({
     $or: [{ userName }, { email }],
@@ -32,6 +40,7 @@ export async function reigsterUser(req, res) {
     userName,
     email,
     password,
+    cover_image: uploadPath,
   });
 
   if (!user) {
