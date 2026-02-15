@@ -1,17 +1,18 @@
 import { Router } from "express";
 import authMiddleware from "../middleware/auth.middleware.js";
 import {
-  comment,
-  commentOfABlog,
   createBlog,
   deleteBlog,
   getAllBlogs,
   getBlog,
   getUserBlogs,
-  updateComment,
 } from "../controllers/blogs.controllers.js";
 import { createBlogValidation } from "../validate/blogs.validate.js";
 import validateMiddleware from "../middleware/validators.middlewares.js";
+import {
+  comment,
+  commentOfABlog,
+} from "../controllers/comments.controllers.js";
 
 const blogRouter = Router();
 
@@ -29,7 +30,5 @@ blogRouter.route("/:blogId/comment/").post(authMiddleware, comment);
 blogRouter
   .route("/commentOfABlog/:blogId/")
   .get(authMiddleware, commentOfABlog);
- 
-
 
 export default blogRouter;
