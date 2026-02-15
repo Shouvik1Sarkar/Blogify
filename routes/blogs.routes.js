@@ -13,6 +13,7 @@ import {
   comment,
   commentOfABlog,
 } from "../controllers/comments.controllers.js";
+import { writeCommentValidation } from "../validate/comment.validate.js";
 
 const blogRouter = Router();
 
@@ -26,7 +27,9 @@ blogRouter.route("/deleteBlog/:id").delete(deleteBlog);
 
 // comment
 
-blogRouter.route("/:blogId/comment/").post(authMiddleware, comment);
+blogRouter
+  .route("/:blogId/comment/")
+  .post(authMiddleware, writeCommentValidation(), validateMiddleware, comment);
 blogRouter
   .route("/commentOfABlog/:blogId/")
   .get(authMiddleware, commentOfABlog);
