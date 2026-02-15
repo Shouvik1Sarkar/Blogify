@@ -1,3 +1,4 @@
+import Comments from "../models/comments.models.js";
 import Likes from "../models/likes.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
@@ -38,4 +39,48 @@ export const likeBlog = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, [liked, totalLikes], "Liked The blog"));
+});
+
+export const likeComment = asyncHandler(async (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(500, "Not Logged In");
+  }
+
+  const { commentId } = req.params;
+
+  const existedLike = await Likes.findOne({
+    targetId: commentId,
+    user: user._id,
+    targetType: "Comment",
+  });
+  let liked;
+  if (existedLike) {
+    await existedLike.deleteOne();
+    liked = false;
+  } else {
+    await Likes.create({
+      targetId: commentId,
+      user: user._id,
+      targetType: "Comment",
+    });
+
+    liked = true;
+  }
+
+  const likeCounts = await Likes.countDocuments({
+    targetId: commentId,
+    targetType: "Comment",
+  });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        [{ liked: liked }, { likeCounts: likeCounts }],
+        "Liked the comment",
+      ),
+    );
 });
