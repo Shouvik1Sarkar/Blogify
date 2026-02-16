@@ -1,3 +1,4 @@
+import Blog from "../models/blog.models.js";
 import PlayList from "../models/playList.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
@@ -33,4 +34,16 @@ export const createPlayList = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(new ApiResponse(201, playList, "Play List created"));
+});
+
+export const allBlogsOfPlayList = asyncHandler(async (req, res) => {
+  const { playListId } = req.params;
+
+  const blogs = await Blog.find({
+    playList: playListId,
+  });
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, blogs, "blogs of this playList"));
 });
