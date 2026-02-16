@@ -233,6 +233,10 @@ export const resetPasswordSendOtp = asyncHandler(async (req, res) => {
   const user = req.user;
   console.log("USER: ", user);
 
+  if (!user) {
+    throw new ApiError(500, "User Not LoggedIn");
+  }
+
   const isPasswordCoreect = await user.comparePassword(password);
   console.log("(((((((((((", isPasswordCoreect);
 

@@ -21,7 +21,7 @@ blogRouter
   .route("/create")
   .post(authMiddleware, createBlogValidation(), validateMiddleware, createBlog);
 blogRouter.route("/getAllBlogs").get(authMiddleware, getAllBlogs);
-blogRouter.route("/getUserBlogs").get(authMiddleware, getUserBlogs);
+blogRouter.route("/:userId/getUserBlogs").get(authMiddleware, getUserBlogs);
 blogRouter.route("/getBlog/:id").get(getBlog);
 blogRouter.route("/deleteBlog/:id").delete(deleteBlog);
 

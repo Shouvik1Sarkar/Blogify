@@ -16,7 +16,8 @@ async function authMiddleware(req, res, next) {
   );
 
   if (!retrievedUser) {
-    throw new ApiError(500, "User not found");
+    return next();
+    // throw new ApiError(500, "User not found");
   }
 
   const user = await User.findById(retrievedUser._id).select("+password");

@@ -7,12 +7,12 @@ const playListSchema = new mongoose.Schema(
       required: true,
     },
 
-    blogs: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Blog",
-      },
-    ],
+    // blogs: [
+    //   {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Blog",
+    //   },
+    // ],
 
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
