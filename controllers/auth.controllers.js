@@ -16,6 +16,8 @@ export async function reigsterUser(req, res) {
   const { fullName, userName, email, password } = req.body;
   const cover_image = req.file?.path;
 
+  console.log("00000000000000 ", cover_image);
+
   const uploadPath = await uploadImage(cover_image);
 
   console.log("upload path", uploadPath);
