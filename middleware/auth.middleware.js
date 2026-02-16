@@ -25,6 +25,9 @@ async function authMiddleware(req, res, next) {
     throw new ApiError(500, "User not found---");
   }
 
+  // if (!user.isEmailVerified) {
+  // }
+
   req.user = user;
 
   return next();

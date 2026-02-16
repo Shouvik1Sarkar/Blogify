@@ -107,6 +107,10 @@ export const logInUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "User not found");
   }
 
+  if (!user.isEmailVerified) {
+    throw new ApiError(500, "verify Email first.");
+  }
+
   const isPass = await user.comparePassword(password);
   if (!isPass) {
     throw new ApiError(401, "Wrong password");

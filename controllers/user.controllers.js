@@ -4,6 +4,7 @@ import User from "../models/user.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
+import uploadImage from "../utils/cloudinaary.utils.js";
 import { forgotPasswordMail } from "../utils/mail.js";
 
 export const getUser = asyncHandler(async (req, res) => {
@@ -43,6 +44,29 @@ export const updateProfile = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, updatedUser, "User Updated"));
+});
+
+export const updateAvatar = asyncHandler(async (req, res) => {
+  const cover_image = req.file?.path;
+
+  if (!cover_image) {
+    throw new ApiError(401, "Image not here");
+  }
+
+  const cloudinary_path = await uploadImage(cover_image);
+
+  const user = req.user;
+
+  if (!user) {
+    throw new ApiError(401, "User not here");
+  }
+
+  user.cover_image = cloudinary_path;
+  await user.save({
+    validateBeforeSave: false,
+  });
+
+  return res.status(201).json(new ApiResponse(201, user, "image uploaded"));
 });
 
 export const deleteProfile = asyncHandler(async (req, res) => {
