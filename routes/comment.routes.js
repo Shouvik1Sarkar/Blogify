@@ -4,8 +4,11 @@ import {
   deleteComment,
   updateComment,
 } from "../controllers/comments.controllers.js";
-import { writeCommentValidation } from "../validate/comment.validate.js";
-import validateMiddleware from "../middleware/validators.middlewares.js";
+import {
+  updateCommentValidation,
+  writeCommentValidation,
+} from "../validate/comment.validate.js";
+import validateMiddleware from "../middleware/validators.middleware.js";
 
 const commentRouter = Router();
 
@@ -13,7 +16,7 @@ commentRouter
   .route("/updateComment/:commentId/")
   .patch(
     authMiddleware,
-    writeCommentValidation(),
+    updateCommentValidation(),
     validateMiddleware,
     updateComment,
   );

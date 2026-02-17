@@ -5,13 +5,16 @@ import { ApiResponse } from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 
 export const comment = asyncHandler(async (req, res) => {
-  const user = req.user;
+  const authUser = req.user;
+
+  const user = await User.findById(authUser._id);
+
   const { blogId } = req.params;
   const { comment } = req.body;
   // console.log("COMMENT: ", comment);
 
   const commentIt = await Comments.create({
-    createBy: user._id,
+    createdBy: user._id,
     comment,
     blog: blogId,
   });
@@ -45,7 +48,9 @@ export const updateComment = asyncHandler(async (req, res) => {
   const { commentId } = req.params;
   const { newComment } = req.body;
 
-  const user = req.user;
+  const authUser = req.user;
+
+  const user = await User.findById(authUser._id);
 
   if (!user) {
     throw new ApiError(401, "Unauthorized");
@@ -58,7 +63,7 @@ export const updateComment = asyncHandler(async (req, res) => {
   const comment = await Comments.findOneAndUpdate(
     {
       _id: commentId,
-      createBy: user._id,
+      createdBy: user._id,
     },
     {
       $set: { comment: newComment },
@@ -85,7 +90,9 @@ export const deleteComment = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Comment ID is required");
   }
 
-  const user = req.user;
+  const authUser = req.user;
+
+  const user = await User.findById(authUser._id);
 
   if (!user) {
     throw new ApiError(401, "Unauthorized");

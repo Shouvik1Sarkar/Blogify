@@ -4,11 +4,12 @@ import User from "../models/user.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
-import uploadImage from "../utils/cloudinaary.utils.js";
+import uploadImage from "../utils/cloudinary.utils.js";
 import { forgotPasswordMail } from "../utils/mail.js";
 
 export const getUser = asyncHandler(async (req, res) => {
   const user = req.user;
+
   console.log("USER: ", user);
   if (!user) {
     throw new ApiError(401, "Unauthorized");
@@ -20,6 +21,7 @@ export const getUser = asyncHandler(async (req, res) => {
 export const updateProfile = asyncHandler(async (req, res) => {
   const { userName, bio } = req.body;
   const user = req.user;
+
   if (!user) {
     throw new ApiError(401, "Unauthorized");
   }
@@ -72,7 +74,9 @@ export const updateAvatar = asyncHandler(async (req, res) => {
 });
 
 export const deleteProfile = asyncHandler(async (req, res) => {
-  const user = req.user;
+  const authUser = req.user;
+
+  const user = await User.findById(authUser._id);
   if (!user) {
     throw new ApiError(401, "Unauthorized");
   }

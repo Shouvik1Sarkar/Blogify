@@ -4,7 +4,7 @@ import {
   changeForgottenPassword,
   logInUser,
   logOutUser,
-  reigsterUser,
+  registerUser,
   resetPasswordSendOtp,
   validateEmail,
   forgotPassword,
@@ -13,7 +13,7 @@ import {
   changeForgotPasswordValidation,
   registrationValidation,
 } from "../validate/index.js";
-import validateMiddleware from "../middleware/validators.middlewares.js";
+import validateMiddleware from "../middleware/validators.middleware.js";
 import authMiddleware from "../middleware/auth.middleware.js";
 import upload from "../middleware/multer.middleware.js";
 
@@ -25,7 +25,7 @@ authRouter
     upload.single("cover_image"),
     registrationValidation(),
     validateMiddleware,
-    reigsterUser,
+    registerUser,
   );
 authRouter.route("/validate/:token").get(validateEmail);
 

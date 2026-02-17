@@ -10,9 +10,9 @@ import {
   forgotPasswordMail,
 } from "../utils/mail.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
-import uploadImage from "../utils/cloudinaary.utils.js";
+import uploadImage from "../utils/cloudinary.utils.js";
 
-export const reigsterUser = asyncHandler(async (req, res) => {
+export const registerUser = asyncHandler(async (req, res) => {
   const { fullName, userName, email, password } = req.body;
   const cover_image = req.file?.path;
 
@@ -121,7 +121,6 @@ export const logInUser = asyncHandler(async (req, res) => {
   const accessToken = await user.generateAccessToken();
   const refreshToken = await user.generateRefreshToken();
 
-  user.accessToken = accessToken;
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
 
@@ -210,11 +209,11 @@ export const changeForgottenPassword = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
-    throw new ApiError(500, "WRONG OTP");
+    throw new ApiError(400, "WRONG OTP");
   }
 
   if (newPassword !== confirmNewPassword) {
-    throw new ApiError(500, "Passwords did not match");
+    throw new ApiError(400, "Passwords did not match");
   }
 
   user.password = newPassword;
@@ -223,10 +222,11 @@ export const changeForgottenPassword = asyncHandler(async (req, res) => {
   console.log("0000000000000000", user.userName);
 
   await user.save();
+  user.password = undefined;
 
   return res
-    .status(201)
-    .json(new ApiResponse(201, user, "Password updated successfully"));
+    .status(200)
+    .json(new ApiResponse(200, user, "Password updated successfully"));
 });
 
 export const resetPasswordSendOtp = asyncHandler(async (req, res) => {
@@ -236,8 +236,10 @@ export const resetPasswordSendOtp = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Password is required");
   }
 
-  const user = req.user;
-  console.log("USER: ", user);
+  const authUser = req.user;
+  console.log("USER: ", authUser);
+
+  const user = await User.findById(authUser._id).select("+password");
 
   if (!user) {
     throw new ApiError(401, "Unauthorized");
@@ -269,13 +271,30 @@ export const resetPasswordSendOtp = asyncHandler(async (req, res) => {
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
-  const { newPassword, confirmNewPassword } = req.body;
+  const { otp } = req.body;
+  if (!otp) {
+    throw new ApiError(400, "Otp not here");
+  }
 
-  const user = req.user;
+  const otps = crypto.createHash("sha256").update(otp).digest("hex");
 
+  const isUsOtp = await User.findOne({
+    $and: [{ resetToken: otps }, { resetTokenExpiry: { $gt: Date.now() } }],
+  });
+
+  if (!isUsOtp) {
+    throw new ApiError(400, "Otp not match ");
+  }
+
+  const authUser = req.user;
+  console.log("USER: ", authUser);
+
+  const user = await User.findById(authUser._id);
   if (!user) {
     throw new ApiError(401, "Unauthorized");
   }
+
+  const { newPassword, confirmNewPassword } = req.body;
 
   if (newPassword !== confirmNewPassword) {
     throw new ApiError(400, "Passwords do not match");
@@ -287,6 +306,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
   // console.log("0000000000000000", user.userName);
 
   await user.save();
+  user.password = undefined;
 
   return res
     .status(200)

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const commentsSchema = new mongoose.Schema(
   {
-    createBy: {
+    createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },

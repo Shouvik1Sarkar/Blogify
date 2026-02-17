@@ -1,5 +1,6 @@
 import Blog from "../models/blog.models.js";
 import PlayList from "../models/playList.models.js";
+import User from "../models/user.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
@@ -7,7 +8,9 @@ import asyncHandler from "../utils/asyncHandler.utils.js";
 export const createPlayList = asyncHandler(async (req, res) => {
   const { title } = req.body;
 
-  const user = req.user;
+  const authUser = req.user;
+
+  const user = await User.findById(authUser._id);
 
   if (!user) {
     throw new ApiError(401, "Unauthorized");

@@ -8,3 +8,11 @@ export function writeCommentValidation() {
       .withMessage("this field can not be empty"),
   ];
 }
+export function updateCommentValidation() {
+  return [
+    body("newComment")
+      .trim()
+      .notEmpty()
+      .withMessage("this field can not be empty"),
+  ];
+}

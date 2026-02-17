@@ -1,6 +1,6 @@
 import express from "express";
 
-import validateMiddleware from "../middleware/validators.middlewares.js";
+import validateMiddleware from "../middleware/validators.middleware.js";
 import authMiddleware from "../middleware/auth.middleware.js";
 import {
   deleteProfile,

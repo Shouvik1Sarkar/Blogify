@@ -8,7 +8,7 @@ import {
   getUserBlogs,
 } from "../controllers/blogs.controllers.js";
 import { createBlogValidation } from "../validate/blogs.validate.js";
-import validateMiddleware from "../middleware/validators.middlewares.js";
+import validateMiddleware from "../middleware/validators.middleware.js";
 import {
   comment,
   commentOfABlog,
@@ -19,7 +19,7 @@ const blogRouter = Router();
 
 blogRouter
   .route("/create")
-  .post(authMiddleware, createBlogValidation(), validateMiddleware, createBlog);
+  .post(createBlogValidation(), validateMiddleware, authMiddleware, createBlog);
 blogRouter.route("/getAllBlogs").get(authMiddleware, getAllBlogs);
 blogRouter.route("/:userId/getUserBlogs").get(authMiddleware, getUserBlogs);
 blogRouter.route("/getBlog/:id").get(getBlog);

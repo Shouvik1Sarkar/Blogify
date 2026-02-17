@@ -1,5 +1,6 @@
 import Comments from "../models/comments.models.js";
 import Likes from "../models/likes.models.js";
+import User from "../models/user.models.js";
 import ApiError from "../utils/ApiError.utils.js";
 import { ApiResponse } from "../utils/ApiResponse.utils.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
@@ -50,7 +51,9 @@ export const likeBlog = asyncHandler(async (req, res) => {
 });
 
 export const likeComment = asyncHandler(async (req, res) => {
-  const user = req.user;
+  const authUser = req.user;
+
+  const user = await User.findById(authUser._id);
 
   if (!user) {
     throw new ApiError(401, "Unauthorized");

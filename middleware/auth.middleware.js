@@ -7,23 +7,24 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
   const cookieToken = req.cookies?.accessToken;
   console.log("COOKIES:---- ", cookieToken);
   if (!cookieToken) {
-    throw new ApiError(500, "Not loggedIn cookie not here");
+    throw new ApiError(401, "Not loggedIn cookie not here");
   }
 
   const retrievedUser = await jwt.verify(
     cookieToken,
     process.env.ACCESS_TOKEN_SECRET,
   );
+  console.log("----", retrievedUser);
 
   if (!retrievedUser) {
     return next();
     // throw new ApiError(500, "User not found");
   }
 
-  const user = await User.findById(retrievedUser._id).select("+password");
+  const user = await User.findById(retrievedUser._id);
 
   if (!user) {
-    throw new ApiError(500, "User not found---");
+    throw new ApiError(404, "User not found---");
   }
 
   if (!user.isEmailVerified) {

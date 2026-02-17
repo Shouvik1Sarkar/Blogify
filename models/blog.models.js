@@ -5,11 +5,16 @@ const blogSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
+      trim: true,
+      minLength: 5,
+      maxLength: 200,
     },
 
     content: {
       type: String,
       required: true,
+      trim: true,
+      minLength: 10,
     },
 
     description: {
@@ -19,6 +24,7 @@ const blogSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
     playList: {
       type: mongoose.Schema.Types.ObjectId,

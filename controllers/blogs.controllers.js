@@ -10,6 +10,10 @@ import User from "../models/user.models.js";
 export const createBlog = asyncHandler(async (req, res) => {
   const user = req.user;
 
+  if (!user) {
+    throw new ApiError(401, "Unauthorized");
+  }
+
   const { title, content, description } = req.body;
   const { playListId } = req.params;
   let playList = null;
@@ -42,7 +46,9 @@ export const createBlog = asyncHandler(async (req, res) => {
 });
 
 export const getAllBlogs = asyncHandler(async (req, res) => {
-  const user = req.user;
+  const authUser = req.user;
+
+  const user = await User.findById(authUser._id);
   if (!user) {
     throw new ApiError(401, "Unauthorized");
   }
