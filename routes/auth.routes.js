@@ -19,36 +19,35 @@ import upload from "../middleware/multer.middleware.js";
 
 const authRouter = express.Router();
 
-authRouter
-  .route("/register")
-  .post(
-    upload.single("cover_image"),
-    registrationValidation(),
-    validateMiddleware,
-    registerUser,
-  );
-authRouter.route("/validate/:token").get(validateEmail);
+authRouter.post(
+  "/register",
+  upload.single("cover_image"),
+  registrationValidation(),
+  validateMiddleware,
+  registerUser,
+);
 
-authRouter.route("/logIn").post(logInUser);
+authRouter.get("/verify-email/:token", validateEmail);
 
-authRouter.get("/logOut", authMiddleware, logOutUser);
+authRouter.post("/login", logInUser);
 
-authRouter.route("/forgotPassword").post(forgotPassword);
-authRouter
-  .route("/resetForgottenPassword")
-  .post(
-    changeForgotPasswordValidation(),
-    validateMiddleware,
-    changeForgottenPassword,
-  );
-authRouter.route("/resetPassword").post(authMiddleware, resetPasswordSendOtp);
-authRouter
-  .route("/changePassword")
-  .post(
-    changeForgotPasswordValidation(),
-    validateMiddleware,
-    authMiddleware,
-    resetPassword,
-  );
+authRouter.get("/logout", authMiddleware, logOutUser);
+
+authRouter.post("/forgot-password", forgotPassword);
+
+authRouter.post(
+  "/password/change/request",
+  authMiddleware,
+  resetPasswordSendOtp,
+);
+
+// Step 2: Verify OTP & update password
+authRouter.post(
+  "/password/change/confirm",
+  authMiddleware,
+  changeForgotPasswordValidation(),
+  validateMiddleware,
+  resetPassword,
+);
 
 export default authRouter;

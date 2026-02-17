@@ -18,20 +18,18 @@ import { writeCommentValidation } from "../validate/comment.validate.js";
 const blogRouter = Router();
 
 blogRouter
-  .route("/create")
+  .route("/")
   .post(createBlogValidation(), validateMiddleware, authMiddleware, createBlog);
 blogRouter.route("/getAllBlogs").get(authMiddleware, getAllBlogs);
-blogRouter.route("/:userId/getUserBlogs").get(authMiddleware, getUserBlogs);
-blogRouter.route("/getBlog/:id").get(getBlog);
-blogRouter.route("/deleteBlog/:id").delete(deleteBlog);
+blogRouter.route("/:id").get(authMiddleware, getUserBlogs);
+blogRouter.route("/getblog/:blogId").get(getBlog);
+blogRouter.route("/delete/:id").delete(deleteBlog);
 
 // comment
 
 blogRouter
-  .route("/:blogId/comment/")
+  .route("/:blogId/comments")
   .post(authMiddleware, writeCommentValidation(), validateMiddleware, comment);
-blogRouter
-  .route("/commentOfABlog/:blogId/")
-  .get(authMiddleware, commentOfABlog);
+blogRouter.route("/:blogId/comments").get(authMiddleware, commentOfABlog);
 
 export default blogRouter;

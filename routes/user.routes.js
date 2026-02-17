@@ -12,11 +12,21 @@ import upload from "../middleware/multer.middleware.js";
 
 const userRouter = express.Router();
 
+// get my profile
 userRouter.route("/me").get(authMiddleware, getUser);
-userRouter.route("/updateProfile").post(authMiddleware, updateProfile);
-userRouter
-  .route("/updateAvatar")
-  .post(upload.single("cover_image"), authMiddleware, updateAvatar);
-userRouter.route("/deleteProfile").get(authMiddleware, deleteProfile);
+
+// Update profile (name, bio etc.)
+userRouter.patch("/me", authMiddleware, updateProfile);
+
+// Update avatar
+userRouter.patch(
+  "/me/avatar",
+  authMiddleware,
+  upload.single("cover_image"),
+  updateAvatar,
+);
+
+// Delete account
+userRouter.delete("/me/delete", authMiddleware, deleteProfile);
 
 export default userRouter;

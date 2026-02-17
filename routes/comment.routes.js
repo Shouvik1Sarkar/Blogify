@@ -13,7 +13,7 @@ import validateMiddleware from "../middleware/validators.middleware.js";
 const commentRouter = Router();
 
 commentRouter
-  .route("/updateComment/:commentId/")
+  .route("/update/:commentId/")
   .patch(
     authMiddleware,
     updateCommentValidation(),
@@ -21,7 +21,7 @@ commentRouter
     updateComment,
   );
 commentRouter
-  .route("/deleteComment/:commentId/")
+  .route("/delete/:commentId/")
   .delete(authMiddleware, deleteComment);
 
 export default commentRouter;

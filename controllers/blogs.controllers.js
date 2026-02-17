@@ -73,12 +73,12 @@ export const getUserBlogs = asyncHandler(async (req, res) => {
   //   throw new ApiError(500, "User Not Logged In");
   // }
 
-  const { userId } = req.params;
-  if (!userId) {
+  const { id } = req.params;
+  if (!id) {
     throw new ApiError(400, "User ID is required");
   }
 
-  const user = await User.findById(userId);
+  const user = await User.findById(id);
 
   const allBlogs = await Blog.find({
     createdBy: user._id,
@@ -90,9 +90,9 @@ export const getUserBlogs = asyncHandler(async (req, res) => {
 });
 
 export const getBlog = asyncHandler(async (req, res) => {
-  const { id } = req.params;
+  const { blogId } = req.params;
 
-  const blog = await Blog.findById(id);
+  const blog = await Blog.findById(blogId);
 
   if (!blog) {
     throw new ApiError(404, "Blog not found");
