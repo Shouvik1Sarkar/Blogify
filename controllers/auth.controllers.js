@@ -12,7 +12,7 @@ import {
 import asyncHandler from "../utils/asyncHandler.utils.js";
 import uploadImage from "../utils/cloudinaary.utils.js";
 
-export async function reigsterUser(req, res) {
+export const reigsterUser = asyncHandler(async (req, res) => {
   const { fullName, userName, email, password } = req.body;
   const cover_image = req.file?.path;
 
@@ -71,9 +71,9 @@ export async function reigsterUser(req, res) {
   return res
     .status(201)
     .json(new ApiResponse(201, user, "User Created Successfully"));
-}
+});
 
-export async function validateEmail(req, res) {
+export const validateEmail = asyncHandler(async (req, res) => {
   const { token } = req.params;
 
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
@@ -97,7 +97,7 @@ export async function validateEmail(req, res) {
   user.emailVerificationTokenExpiry = undefined;
   await user.save({ validateBeforeSave: false });
   return res.status(200).json(new ApiResponse(200, user, "USER VERIFIED"));
-}
+});
 
 export const logInUser = asyncHandler(async (req, res) => {
   const { userName, email, password } = req.body;
