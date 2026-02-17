@@ -7,11 +7,19 @@ import asyncHandler from "../utils/asyncHandler.utils.js";
 export const likeBlog = asyncHandler(async (req, res) => {
   const { blogId } = req.params;
   const users = req.user;
-
-  if (!blogId) {
-    throw new ApiError(400, "Blog not found.");
+  if (!users) {
+    throw new ApiError(401, "Unauthorized");
   }
 
+  if (!blogId) {
+    throw new ApiError(400, "Blog ID is required");
+  }
+  const blog = await Blog.findById(blogId);
+
+  // 404 = Resource not found
+  if (!blog) {
+    throw new ApiError(404, "Blog not found");
+  }
   const existingLike = await Likes.findOne({
     targetId: blogId,
     user: users._id,
@@ -35,7 +43,7 @@ export const likeBlog = asyncHandler(async (req, res) => {
     targetId: blogId,
     targetType: "Blog",
   });
-  console.log("LIKE COUNDT", totalLikes);
+  // console.log("LIKE COUNDT", totalLikes);
   return res
     .status(200)
     .json(new ApiResponse(200, [liked, totalLikes], "Liked The blog"));
@@ -45,10 +53,14 @@ export const likeComment = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(500, "Not Logged In");
+    throw new ApiError(401, "Unauthorized");
   }
 
   const { commentId } = req.params;
+
+  if (!commentId) {
+    throw new ApiError(400, "Comment ID is required");
+  }
 
   const existedLike = await Likes.findOne({
     targetId: commentId,

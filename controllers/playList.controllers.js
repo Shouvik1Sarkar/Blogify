@@ -10,7 +10,7 @@ export const createPlayList = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(500, "User Not found");
+    throw new ApiError(401, "Unauthorized");
   }
 
   //   const existedPlayList = await PlayList.findOne({
@@ -28,7 +28,7 @@ export const createPlayList = asyncHandler(async (req, res) => {
   });
 
   if (!playList) {
-    throw new ApiError(500, "Play List not created.");
+    throw new ApiError(500, "Playlist could not be created");
   }
 
   return res
@@ -38,6 +38,9 @@ export const createPlayList = asyncHandler(async (req, res) => {
 
 export const allBlogsOfPlayList = asyncHandler(async (req, res) => {
   const { playListId } = req.params;
+  if (!playListId) {
+    throw new ApiError(400, "Playlist ID is required");
+  }
 
   const blogs = await Blog.find({
     playList: playListId,

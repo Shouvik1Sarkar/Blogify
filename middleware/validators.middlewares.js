@@ -1,7 +1,8 @@
 import { validationResult } from "express-validator";
 import ApiError from "../utils/ApiError.utils.js";
+import asyncHandler from "../utils/asyncHandler.utils.js";
 
-function validateMiddleware(req, res, next) {
+const validateMiddleware = asyncHandler(async (req, res, next) => {
   const errors = validationResult(req);
 
   if (errors.isEmpty()) {
@@ -19,5 +20,5 @@ function validateMiddleware(req, res, next) {
   console.log("EXTRACTED ERROR: ", extractedError);
 
   throw new ApiError(422, "RECIEVED DATA IS NOT", extractedError);
-}
+});
 export default validateMiddleware;

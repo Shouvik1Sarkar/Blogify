@@ -31,9 +31,9 @@ export async function reigsterUser(req, res) {
   if (existedUser) {
     console.log("YYYYYYYYY", existedUser.isEmailVerified);
     if (!existedUser.isEmailVerified) {
-      throw new ApiError(400, "Verify you email.");
+      throw new ApiError(403, "Verify you email.");
     } else {
-      throw new ApiError(400, "User Already exists. LogIn ");
+      throw new ApiError(409, "User Already exists. LogIn ");
     }
   }
 
@@ -46,31 +46,31 @@ export async function reigsterUser(req, res) {
   });
 
   if (!user) {
-    throw new ApiError(400, "User not created ");
+    throw new ApiError(500, "User could not be created.");
   }
   const { unhashedToken, hashedToken, expiresIn } =
     user.generateEmailVerificationToken();
 
   await user.save({ validateBeforeSave: false });
   const verification_url = `http://localhost:5500/api/v1/auth/validate/${unhashedToken}`;
-  const mailGenContent = await emailVerificationMail(
-    user.userName,
-    verification_url,
-  );
+  // const mailGenContent = await emailVerificationMail(
+  //   user.userName,
+  //   verification_url,
+  // );
 
   console.log("VERIFICATION URL", verification_url);
-  await emailSend({
-    email: user.email,
-    subject: "This is subject",
-    mailGenContent,
-  });
+  // await emailSend({
+  //   email: user.email,
+  //   subject: "This is subject",
+  //   mailGenContent,
+  // });
 
   console.log("-----", user.emailVerificationToken);
   console.log("-----", user.emailVerificationTokenExpiry);
 
   return res
-    .status(200)
-    .json(new ApiResponse(200, user, "User Created Successfully"));
+    .status(201)
+    .json(new ApiResponse(201, user, "User Created Successfully"));
 }
 
 export async function validateEmail(req, res) {
@@ -89,7 +89,7 @@ export async function validateEmail(req, res) {
     ],
   });
   if (!user) {
-    throw new ApiError(500, "User not found");
+    throw new ApiError(400, "Invalid or expired verification token.");
   }
 
   user.isEmailVerified = true;
@@ -106,11 +106,11 @@ export const logInUser = asyncHandler(async (req, res) => {
   }).select("+password");
 
   if (!user) {
-    throw new ApiError(500, "User not found");
+    throw new ApiError(401, "Invalid credentials");
   }
 
   if (!user.isEmailVerified) {
-    throw new ApiError(500, "verify Email first.");
+    throw new ApiError(403, "Please verify your email first.");
   }
 
   const isPass = await user.comparePassword(password);
@@ -143,7 +143,7 @@ export const logInUser = asyncHandler(async (req, res) => {
 export const logOutUser = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
-    throw new ApiError(500, "User Not found");
+    throw new ApiError(401, "Unauthorized");
   }
 
   const loggedOutUser = await User.findByIdAndUpdate(user._id, {
@@ -158,7 +158,7 @@ export const logOutUser = asyncHandler(async (req, res) => {
   await loggedOutUser.save({ validateBeforeSave: false });
 
   return res
-    .status(201)
+    .status(200)
     .clearCookie("accessToken")
     .clearCookie("refreshToken")
     .json(new ApiResponse(200, loggedOutUser, "User Logged Out"));
@@ -172,20 +172,26 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
-    throw new ApiError(500, "User Not Found");
+    throw new ApiError(404, "User not found");
   }
 
   const forgotToken = crypto.randomInt(100000, 999999);
 
-  forgotPasswordMail(user.userName, forgotToken);
+  // const mailGenContent = await forgotPasswordMail(user.userName, forgotToken);
   user.forgotToken = forgotToken;
   user.forgotTokenExpiry = Date.now() + 20 * 60 * 1000;
+
+  // await emailSend({
+  //   email: user.email,
+  //   subject: "This is subject",
+  //   mailGenContent,
+  // });
 
   await user.save({ validateBeforeSave: false });
 
   console.log("OTP: ", forgotToken);
 
-  return res.status(201).json(new ApiResponse(201, user, "OTP SENT"));
+  return res.status(200).json(new ApiResponse(200, user, "OTP SENT"));
 });
 
 export const changeForgottenPassword = asyncHandler(async (req, res) => {
@@ -227,34 +233,39 @@ export const resetPasswordSendOtp = asyncHandler(async (req, res) => {
   const { password } = req.body;
 
   if (!password) {
-    throw new ApiError(500, "PASSWORD IS REQUIROED");
+    throw new ApiError(400, "Password is required");
   }
 
   const user = req.user;
   console.log("USER: ", user);
 
   if (!user) {
-    throw new ApiError(500, "User Not LoggedIn");
+    throw new ApiError(401, "Unauthorized");
   }
 
   const isPasswordCoreect = await user.comparePassword(password);
-  console.log("(((((((((((", isPasswordCoreect);
 
   if (!isPasswordCoreect) {
-    throw new ApiError(500, "Password did not match");
+    throw new ApiError(401, "Invalid credentials");
   }
 
   const forgotToken = crypto.randomInt(100000, 999999);
 
-  //   forgotPasswordMail(user.userName, forgotToken);
+  // const mailGenContent = await forgotPasswordMail(user.userName, forgotToken);
   user.resetToken = forgotToken;
   user.resetTokenExpiry = Date.now() + 20 * 60 * 1000;
+
+  // await emailSend({
+  //   email: user.email,
+  //   subject: "Fot got password",
+  //   mailGenContent,
+  // });
 
   await user.save({ validateBeforeSave: false });
 
   console.log("OTP: ", forgotToken);
 
-  return res.status(201).json(new ApiResponse(201, user, "OTP SENT"));
+  return res.status(200).json(new ApiResponse(200, user, "OTP SENT"));
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
@@ -263,21 +274,21 @@ export const resetPassword = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(500, "NOT LOGGED IN");
+    throw new ApiError(401, "Unauthorized");
   }
 
   if (newPassword !== confirmNewPassword) {
-    throw new ApiError(500, "Passwords did not match");
+    throw new ApiError(400, "Passwords do not match");
   }
 
   user.password = newPassword;
   user.resetToken = undefined;
   user.resetTokenExpiry = undefined;
-  console.log("0000000000000000", user.userName);
+  // console.log("0000000000000000", user.userName);
 
   await user.save();
 
   return res
-    .status(201)
-    .json(new ApiResponse(201, user, "Password updated successfully"));
+    .status(200)
+    .json(new ApiResponse(200, user, "Password updated successfully"));
 });

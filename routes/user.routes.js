@@ -12,7 +12,7 @@ import upload from "../middleware/multer.middleware.js";
 
 const userRouter = express.Router();
 
-userRouter.route("/get").get(authMiddleware, getUser);
+userRouter.route("/me").get(authMiddleware, getUser);
 userRouter.route("/updateProfile").post(authMiddleware, updateProfile);
 userRouter
   .route("/updateAvatar")

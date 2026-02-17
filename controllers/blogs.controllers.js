@@ -17,7 +17,7 @@ export const createBlog = asyncHandler(async (req, res) => {
     playList = await PlayList.findById(playListId);
 
     if (!playList) {
-      throw new ApiError(500, "Play List not found");
+      throw new ApiError(404, "Playlist not found");
     }
   }
 
@@ -30,7 +30,7 @@ export const createBlog = asyncHandler(async (req, res) => {
   });
 
   if (!createsBlog) {
-    throw new ApiError(500, "Blog created");
+    throw new ApiError(500, "Blog could not be created");
   }
   if (playListId) {
     await createsBlog.populate("playList", "title");
@@ -44,22 +44,23 @@ export const createBlog = asyncHandler(async (req, res) => {
 export const getAllBlogs = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
-    throw new ApiError(500, "User Not Logged In");
+    throw new ApiError(401, "Unauthorized");
   }
   const user_role = user.role;
   if (user_role !== available_roles.admin) {
-    throw new ApiError(500, "You are not authorized to get all the blogs");
+    throw new ApiError(403, "Forbidden");
   }
   const allBlogs = await Blog.find();
 
   if (!allBlogs) {
-    throw new ApiError(500, "All Blogs are here");
+    throw new ApiError(500, "blogs aren't here some how.");
   }
 
   return res
     .status(200)
     .json(new ApiResponse(200, allBlogs, "All Blogs are here."));
 });
+
 export const getUserBlogs = asyncHandler(async (req, res) => {
   // const user = req.user;
   // if (!user) {
@@ -68,7 +69,7 @@ export const getUserBlogs = asyncHandler(async (req, res) => {
 
   const { userId } = req.params;
   if (!userId) {
-    throw new ApiError(500, "User not found");
+    throw new ApiError(400, "User ID is required");
   }
 
   const user = await User.findById(userId);
@@ -76,10 +77,6 @@ export const getUserBlogs = asyncHandler(async (req, res) => {
   const allBlogs = await Blog.find({
     createdBy: user._id,
   });
-
-  if (!allBlogs) {
-    throw new ApiError(500, "blogs not found");
-  }
 
   return res
     .status(200)
@@ -92,15 +89,20 @@ export const getBlog = asyncHandler(async (req, res) => {
   const blog = await Blog.findById(id);
 
   if (!blog) {
-    throw new ApiError(500, "Blog not found");
+    throw new ApiError(404, "Blog not found");
   }
 
   return res.status(200).json(new ApiResponse(200, blog, "BLOG"));
 });
+
 export const deleteBlog = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  await Blog.findByIdAndDelete(id);
+  const deletedBlog = await Blog.findByIdAndDelete(id);
+
+  if (!deletedBlog) {
+    throw new ApiError(404, "Blog not found");
+  }
 
   return res.status(200).json(new ApiResponse(200, null, "BLOG deleted"));
 });

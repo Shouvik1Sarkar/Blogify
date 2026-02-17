@@ -2,8 +2,8 @@ import bcrypt from "bcryptjs";
 import ApiError from "../utils/ApiError.utils.js";
 import jwt from "jsonwebtoken";
 import User from "../models/user.models.js";
-
-async function authMiddleware(req, res, next) {
+import asyncHandler from "../utils/asyncHandler.utils.js";
+const authMiddleware = asyncHandler(async (req, res, next) => {
   const cookieToken = req.cookies?.accessToken;
   console.log("COOKIES:---- ", cookieToken);
   if (!cookieToken) {
@@ -26,12 +26,12 @@ async function authMiddleware(req, res, next) {
     throw new ApiError(500, "User not found---");
   }
 
-  // if (!user.isEmailVerified) {
-  // }
+  if (!user.isEmailVerified) {
+  }
 
   req.user = user;
 
   return next();
-}
+});
 
 export default authMiddleware;

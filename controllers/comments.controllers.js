@@ -8,7 +8,7 @@ export const comment = asyncHandler(async (req, res) => {
   const user = req.user;
   const { blogId } = req.params;
   const { comment } = req.body;
-  console.log("COMMENT: ", comment);
+  // console.log("COMMENT: ", comment);
 
   const commentIt = await Comments.create({
     createBy: user._id,
@@ -17,28 +17,25 @@ export const comment = asyncHandler(async (req, res) => {
   });
 
   if (!commentIt) {
-    throw new ApiError(500, "Comment not created");
+    throw new ApiError(401, "Unauthorized");
   }
 
-  console.log("XXXXXXXXXXXXXXXXXXXXX", commentIt);
+  // console.log("XXXXXXXXXXXXXXXXXXXXX", commentIt)d;
 
-  return res.status(200).json(new ApiResponse(200, commentIt, "Comment added"));
+  return res.status(201).json(new ApiResponse(201, commentIt, "Comment added"));
 });
 
 export const commentOfABlog = asyncHandler(async (req, res) => {
   const { blogId } = req.params;
 
   if (!blogId) {
-    throw new ApiError(500, "BLOG ID NOT FOUND");
+    throw new ApiError(400, "Blog ID is required");
   }
 
   const allComments = await Comments.find({
     blog: blogId,
   });
 
-  if (!allComments) {
-    throw new ApiError(500, "Comments not found");
-  }
   return res
     .status(200)
     .json(new ApiResponse(200, allComments, "All comments are here."));
@@ -50,7 +47,9 @@ export const updateComment = asyncHandler(async (req, res) => {
 
   const user = req.user;
 
-  console.log("09090909", user._id);
+  if (!user) {
+    throw new ApiError(401, "Unauthorized");
+  }
 
   if (!commentId) {
     throw new ApiError(400, "Comment ID is required");
@@ -81,16 +80,21 @@ export const updateComment = asyncHandler(async (req, res) => {
 
 export const deleteComment = asyncHandler(async (req, res) => {
   const { commentId } = req.params;
+
   if (!commentId) {
-    throw new ApiError(401, "COMMENT NOT FOUND");
+    throw new ApiError(400, "Comment ID is required");
   }
 
   const user = req.user;
+
   if (!user) {
-    throw new ApiError(401, "User Not Found");
+    throw new ApiError(401, "Unauthorized");
   }
 
-  await Comments.findByIdAndDelete(commentId);
+  const deletedComment = await Comments.findByIdAndDelete(commentId);
+  if (!deletedComment) {
+    throw new ApiError(404, "Comment not found or unauthorized");
+  }
 
   return res.status(201).json(new ApiResponse(201, null, "COMMENT DELETED"));
 });

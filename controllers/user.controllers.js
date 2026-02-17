@@ -11,7 +11,7 @@ export const getUser = asyncHandler(async (req, res) => {
   const user = req.user;
   console.log("USER: ", user);
   if (!user) {
-    throw new ApiError(500, "NOT LOGGEDIN");
+    throw new ApiError(401, "Unauthorized");
   }
 
   return res.status(200).json(new ApiResponse(200, user, "THIS IS USER"));
@@ -20,7 +20,9 @@ export const getUser = asyncHandler(async (req, res) => {
 export const updateProfile = asyncHandler(async (req, res) => {
   const { userName, bio } = req.body;
   const user = req.user;
-
+  if (!user) {
+    throw new ApiError(401, "Unauthorized");
+  }
   const profileObject = {};
 
   if (userName !== undefined) profileObject.userName = userName;
@@ -28,7 +30,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
 
   const existedUser = await User.findOne({ userName });
   if (existedUser) {
-    throw new ApiError(500, "User Name already exists");
+    throw new ApiError(409, "Username already exists");
   }
 
   const updatedUser = await User.findByIdAndUpdate(
@@ -50,7 +52,7 @@ export const updateAvatar = asyncHandler(async (req, res) => {
   const cover_image = req.file?.path;
 
   if (!cover_image) {
-    throw new ApiError(401, "Image not here");
+    throw new ApiError(400, "Image not here");
   }
 
   const cloudinary_path = await uploadImage(cover_image);
@@ -58,7 +60,7 @@ export const updateAvatar = asyncHandler(async (req, res) => {
   const user = req.user;
 
   if (!user) {
-    throw new ApiError(401, "User not here");
+    throw new ApiError(401, "Unauthorized");
   }
 
   user.cover_image = cloudinary_path;
@@ -66,23 +68,27 @@ export const updateAvatar = asyncHandler(async (req, res) => {
     validateBeforeSave: false,
   });
 
-  return res.status(201).json(new ApiResponse(201, user, "image uploaded"));
+  return res.status(200).json(new ApiResponse(200, user, "image uploaded"));
 });
 
 export const deleteProfile = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
-    throw new ApiError(500, "not found User.");
+    throw new ApiError(401, "Unauthorized");
   }
   const deleteUser = await User.findByIdAndDelete(user._id);
+  if (!deleteUser) {
+    throw new ApiError(404, "User not found");
+  }
   await Blog.deleteMany({ createdBy: user._id });
   await PlayList.deleteMany({ createdBy: user._id });
 
   return res
-    .status(200)
+    .status(204)
     .clearCookie("accessToken")
     .clearCookie("refreshToken")
-    .json(new ApiResponse(200, null, "deleted"));
+    .json(new ApiResponse(204, null, "deleted"))
+    .end();
 });
 
 // export const forgotPassword = asyncHandler(async (req, res) => {
