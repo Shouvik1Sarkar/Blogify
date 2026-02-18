@@ -15,7 +15,7 @@ playListRouter
 playListRouter
   .route("/:playListId/createBlog")
   .post(authMiddleware, createBlog);
-playListRouter.route("/:playListId/allBlogsOfPlayList").get(allBlogsOfPlayList);
+playListRouter.route("/:playListId/blogs").get(allBlogsOfPlayList);
 
 // playListRouter
 //   .route("/:playListId/createBlog")

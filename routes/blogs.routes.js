@@ -23,7 +23,7 @@ blogRouter
 blogRouter.route("/getAllBlogs").get(authMiddleware, getAllBlogs);
 blogRouter.route("/:id").get(authMiddleware, getUserBlogs);
 blogRouter.route("/getblog/:blogId").get(getBlog);
-blogRouter.route("/delete/:id").delete(deleteBlog);
+blogRouter.route("/delete/:id").delete( authMiddleware, deleteBlog);
 
 // comment
 

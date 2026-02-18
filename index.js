@@ -1,7 +1,8 @@
 import express from "express";
 import { PORT, MONGODB_URI } from "./config/env.js";
 import cookieParser from "cookie-parser";
-
+import helmet from "helmet";
+import cors from "cors";
 // Import Variables
 
 import connect_db from "./connection/db.js";
@@ -22,11 +23,20 @@ import playListRouter from "./routes/playList.routes.js";
 const app = express();
 
 app.use(express.json());
+
+app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 // app.use()
 
-connect_db(MONGODB_URI);
+app.use(
+  cors({
+    origin: "http://localhost:5173", // typical Vite
+    credentials: true,
+  }),
+);
+
+// connect_db(MONGODB_URI);
 
 app.get("/", (req, res) => res.send("THIS IS IT"));
 
@@ -39,4 +49,18 @@ app.use("/api/v1/playList/", playListRouter);
 
 app.use(globalError);
 
-app.listen(PORT, () => console.log("Example app running at port:", PORT));
+// ===== Server Startup =====
+const startServer = async () => {
+  try {
+    await connect_db(MONGODB_URI);
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ Failed to connect to database:", error);
+    process.exit(1);
+  }
+};
+
+startServer();

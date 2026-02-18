@@ -8,6 +8,7 @@ async function connect_db(url) {
     })
     .catch((err) => {
       console.error("ERROR CONNECTING MONGODB", err);
+      process.exit(1);
     });
 }
 
