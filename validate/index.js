@@ -31,6 +31,7 @@ function registrationValidation() {
         minUppercase: 1,
         minNumbers: 1,
         minSymbols: 1,
+        maxLength: 50,
       })
       .withMessage(
         "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one symbol.",

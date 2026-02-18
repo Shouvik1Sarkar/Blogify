@@ -44,8 +44,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       trim: true,
-      minLength: 4,
-      maxLength: 25,
+      minLength: 8,
+      maxLength: 50,
       select: false,
     },
     isEmailVerified: {

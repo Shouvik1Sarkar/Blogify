@@ -26,6 +26,7 @@ const blogSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
     playList: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "PlayList",
