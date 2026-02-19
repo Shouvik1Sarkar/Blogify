@@ -16,20 +16,16 @@ export const registerUser = asyncHandler(async (req, res) => {
   const { fullName, userName, email, password } = req.body;
   const cover_image = req.file?.path;
 
-  console.log("00000000000000 ", cover_image);
-
   const uploadPath = await uploadImage(cover_image);
 
   console.log("upload path", uploadPath);
-
-  console.log("***********", cover_image);
 
   const existedUser = await User.findOne({
     $or: [{ userName }, { email }],
   });
 
   if (existedUser) {
-    console.log("YYYYYYYYY", existedUser.isEmailVerified);
+    // console.log("YYYYYYYYY", existedUser.isEmailVerified);
     if (!existedUser.isEmailVerified) {
       throw new ApiError(403, "Verify you email.");
     } else {
@@ -66,7 +62,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   // });
 
   console.log("-----", user.emailVerificationToken);
-  console.log("-----", user.emailVerificationTokenExpiry);
+  // console.log("-----", user.emailVerificationTokenExpiry);
 
   return res
     .status(201)
@@ -135,7 +131,7 @@ export const logInUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken)
+    .cookie("refreshToken", refreshToken, options)
     .json(new ApiResponse(200, userObj, "USER LOGGEDIN"));
 });
 
@@ -219,7 +215,7 @@ export const changeForgottenPassword = asyncHandler(async (req, res) => {
   user.password = newPassword;
   user.forgotToken = undefined;
   user.forgotTokenExpiry = undefined;
-  console.log("0000000000000000", user.userName);
+  // console.log("0000000000000000", user.userName);
 
   await user.save();
   user.password = undefined;
@@ -237,7 +233,7 @@ export const resetPasswordSendOtp = asyncHandler(async (req, res) => {
   }
 
   const authUser = req.user;
-  console.log("USER: ", authUser);
+  // console.log("USER: ", authUser);
 
   const user = await User.findById(authUser._id).select("+password");
 
@@ -287,7 +283,7 @@ export const resetPassword = asyncHandler(async (req, res) => {
   }
 
   const authUser = req.user;
-  console.log("USER: ", authUser);
+  // console.log("USER: ", authUser);
 
   const user = await User.findById(authUser._id);
   if (!user) {

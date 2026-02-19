@@ -5,6 +5,7 @@ import User from "../models/user.models.js";
 import asyncHandler from "../utils/asyncHandler.utils.js";
 const authMiddleware = asyncHandler(async (req, res, next) => {
   const cookieToken = req.cookies?.accessToken;
+
   console.log("COOKIES:---- ", cookieToken);
   if (!cookieToken) {
     throw new ApiError(401, "Not loggedIn cookie not here");
@@ -21,13 +22,16 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
     // throw new ApiError(500, "User not found");
   }
 
-  const user = await User.findById(retrievedUser._id);
+  const user = await User.findById(retrievedUser._id).select(
+    "-emailVerificationToken   -refreshToken-forgotToken -resetToken",
+  );
 
   if (!user) {
     throw new ApiError(404, "User not found---");
   }
 
   if (!user.isEmailVerified) {
+    throw new ApiError(401, "Email not verified");
   }
 
   req.user = user;

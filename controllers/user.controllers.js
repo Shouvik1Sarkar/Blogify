@@ -10,7 +10,7 @@ import { forgotPasswordMail } from "../utils/mail.js";
 export const getUser = asyncHandler(async (req, res) => {
   const user = req.user;
 
-  console.log("USER: ", user);
+  // console.log("USER: ", user);
   if (!user) {
     throw new ApiError(401, "Unauthorized");
   }

@@ -3,8 +3,10 @@ import { PORT, MONGODB_URI } from "./config/env.js";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import cors from "cors";
-// Import Variables
 
+import mongoSanitize from "express-mongo-sanitize";
+// Import Variables
+import arcjetMiddleware from "./middleware/arcjet.middleware.js";
 import connect_db from "./connection/db.js";
 
 // global middlewares
@@ -27,7 +29,7 @@ app.use(
     limit: "10kb",
   }),
 );
-
+app.use(cookieParser());
 app.use(helmet());
 app.use(
   express.urlencoded({
@@ -35,7 +37,7 @@ app.use(
     limit: "10kb",
   }),
 );
-app.use(cookieParser());
+app.set("trust proxy", true);
 // app.use()
 
 app.use(
@@ -44,7 +46,7 @@ app.use(
     credentials: true,
   }),
 );
-
+app.use(arcjetMiddleware);
 // connect_db(MONGODB_URI);
 
 app.get("/", (req, res) => res.send("THIS IS IT"));

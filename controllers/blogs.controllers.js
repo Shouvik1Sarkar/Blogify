@@ -91,6 +91,7 @@ export const getUserBlogs = asyncHandler(async (req, res) => {
 
 export const getBlog = asyncHandler(async (req, res) => {
   const { blogId } = req.params;
+  const user = req.user;
 
   const blog = await Blog.findById(blogId);
 
@@ -104,10 +105,15 @@ export const getBlog = asyncHandler(async (req, res) => {
 export const deleteBlog = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const deletedBlog = await Blog.findByIdAndDelete(id);
+  const user = req.user;
+
+  const deletedBlog = await Blog.findOneAndDelete({
+    _id: id,
+    createdBy: user._id,
+  });
 
   if (!deletedBlog) {
-    throw new ApiError(404, "Blog not found");
+    throw new ApiError(404, "Blog can not be deleted");
   }
 
   return res.status(200).json(new ApiResponse(200, null, "BLOG deleted"));
