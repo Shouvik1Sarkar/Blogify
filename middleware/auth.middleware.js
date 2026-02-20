@@ -34,6 +34,7 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
     throw new ApiError(401, "Email not verified");
   }
 
+  console.log("IN MIDDLEWARE: ", user)
   req.user = user;
 
   return next();

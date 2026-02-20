@@ -11,8 +11,8 @@ const arcjetMiddleware = async (req, res, next) => {
       conclusion: decision.conclusion,
       reason: decision.reason,
     });
-    console.log("xxxxxxxxxxxxxxxxx", decision.isDenied());
-    console.log("xxxxxxxxxxxxxxxxx", decision.reason);
+    // console.log("xxxxxxxxxxxxxxxxx", decision.isDenied());
+    // console.log("xxxxxxxxxxxxxxxxx", decision.reason);
     if (decision.isDenied()) {
       if (decision.reason.isRateLimit()) {
         throw new ApiError(429, "Too many requests. Try again later.");
