@@ -6,11 +6,11 @@ const arcjetMiddleware = async (req, res, next) => {
     // Request 1 token per request (not 5!)
     const decision = await aj.protect(req, { requested: 1 });
 
-    console.log("Arcjet Decision:", {
-      ip: req.ip,
-      conclusion: decision.conclusion,
-      reason: decision.reason,
-    });
+    // console.log("Arcjet Decision:", {
+    //   ip: req.ip,
+    //   conclusion: decision.conclusion,
+    //   reason: decision.reason,
+    // });
     // console.log("xxxxxxxxxxxxxxxxx", decision.isDenied());
     // console.log("xxxxxxxxxxxxxxxxx", decision.reason);
     if (decision.isDenied()) {

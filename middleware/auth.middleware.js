@@ -15,7 +15,7 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
     cookieToken,
     process.env.ACCESS_TOKEN_SECRET,
   );
-  console.log("----", retrievedUser);
+  // console.log("----", retrievedUser);
 
   if (!retrievedUser) {
     return next();
@@ -34,9 +34,9 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
     throw new ApiError(401, "Email not verified");
   }
 
-  console.log("IN MIDDLEWARE: ", user)
+  // console.log("IN MIDDLEWARE: ", user)
   req.user = user;
-
+  console.log("passed");
   return next();
 });
 
