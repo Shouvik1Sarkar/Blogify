@@ -18,7 +18,10 @@ export const createBlog = asyncHandler(async (req, res) => {
   const { playListId } = req.params;
   let playList = null;
   if (playListId) {
-    playList = await PlayList.findById(playListId);
+    playList = await PlayList.findOne({
+      createdBy: user._id,
+      _id: playListId,
+    });
 
     if (!playList) {
       throw new ApiError(404, "Playlist not found");

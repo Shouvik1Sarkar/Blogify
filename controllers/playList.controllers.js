@@ -39,6 +39,20 @@ export const createPlayList = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, playList, "Play List created"));
 });
 
+export const allPlayListOfUser = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const blogs = await PlayList.find({
+    createdBy: user._id,
+  });
+
+  return res.status(200).json(new ApiResponse(200, blogs, "All blogs here."));
+});
+
 export const allBlogsOfPlayList = asyncHandler(async (req, res) => {
   const { playListId } = req.params;
   if (!playListId) {
@@ -52,4 +66,8 @@ export const allBlogsOfPlayList = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(new ApiResponse(201, blogs, "blogs of this playList"));
+});
+
+export const removeFromPlayList = asyncHandler(async (req, res) => {
+  
 });

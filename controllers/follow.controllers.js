@@ -1,3 +1,4 @@
+import Blog from "../models/blog.models.js";
 import Follow from "../models/follow.models.js";
 import User from "../models/user.models.js";
 import ApiError from "../utils/ApiError.utils.js";
@@ -109,4 +110,47 @@ export const allFollowers = asyncHandler(async (req, res) => {
       "all followers",
     ),
   );
+});
+
+export const followFeed = asyncHandler(async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    throw new ApiError(401, "Un Authorized");
+  }
+
+  const followAccounts = await Follow.find({
+    follower: user._id,
+  }).select("following");
+
+  // .select("following"); to avoid extra fields just add _id and following
+
+  // console.log(followAccounts);
+  const followingIds = followAccounts.map((f) => f.following);
+  // console.log(followingIds);
+  const blogs = await Blog.find({
+    createdBy: {
+      $in: followingIds,
+    },
+  })
+    .populate("createdBy", "fullName userName")
+    .sort({ createdAt: -1 });
+  // const blogs = [];
+  // for (const userId of followingIds) {
+  //   const userBlogs = await Blog.find({ createdBy: userId })
+  //     .populate("createdBy", "fullName userName")
+  //     .sort({ createdAt: -1 });
+  //   blogs.push(...userBlogs);
+  // }
+
+  // console.log("BLOGSl:", blogs);
+
+  // console.log("TOTAL BLOGS: ", totalBlogs);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { blogs, totalBlogs: blogs.length }, "Blogs here"),
+    );
+
+  // return res.send("Follows");
 });
