@@ -96,7 +96,7 @@ export const getBlog = asyncHandler(async (req, res) => {
   const { blogId } = req.params;
   const user = req.user;
 
-  const blog = await Blog.findById(blogId);
+  const blog = await Blog.findById(blogId).populate("playList");
 
   if (!blog) {
     throw new ApiError(404, "Blog not found");

@@ -19,11 +19,14 @@ const blogRouter = Router();
 
 blogRouter
   .route("/")
-  .post(createBlogValidation(), validateMiddleware, authMiddleware, createBlog);
+  .post(authMiddleware, createBlogValidation(), validateMiddleware, createBlog);
+blogRouter
+  .route("/creates/:playListId")
+  .post(authMiddleware, createBlogValidation(), validateMiddleware, createBlog);
 blogRouter.route("/getAllBlogs").get(authMiddleware, getAllBlogs);
 blogRouter.route("/:id").get(authMiddleware, getUserBlogs);
 blogRouter.route("/getblog/:blogId").get(getBlog);
-blogRouter.route("/delete/:id").delete( authMiddleware, deleteBlog);
+blogRouter.route("/delete/:id").delete(authMiddleware, deleteBlog);
 
 // comment
 

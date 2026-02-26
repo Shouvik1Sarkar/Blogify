@@ -61,7 +61,7 @@ export const allBlogsOfPlayList = asyncHandler(async (req, res) => {
 
   const blogs = await Blog.find({
     playList: playListId,
-  });
+  }).populate("playList");
 
   return res
     .status(201)
@@ -69,5 +69,52 @@ export const allBlogsOfPlayList = asyncHandler(async (req, res) => {
 });
 
 export const removeFromPlayList = asyncHandler(async (req, res) => {
-  
+  const { playListId, blogId } = req.params;
+
+  const user = req.user;
+  if (!user) {
+    throw new ApiError(401, "Un authorized");
+  }
+  const blog = await Blog.findOne({
+    _id: blogId,
+    playList: playListId,
+    createdBy: user._id,
+  });
+
+  if (!blog) {
+    throw new ApiError(404, "Not found blog");
+  }
+
+  blog.playList = undefined;
+  await blog.save();
+
+  return res.status(200).json(new ApiResponse(200, null, "Deleted"));
+});
+
+export const deletePlayList = asyncHandler(async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    throw new ApiError(401, "Un Authorized");
+  }
+
+  const { playListId } = req.params;
+
+  const playList = await PlayList.find({
+    createdBy: user._id,
+    _id: playListId,
+  });
+
+  if (!playList) {
+    throw new ApiError(404, "Not Found");
+  }
+
+  await Blog.updateMany({
+    playList: playListId,
+    $set: {
+      playList: null,
+    },
+  });
+  await playList.deleteOne();
+
+  return res.status(200).json(new ApiResponse(200, null, "Deleted"));
 });
