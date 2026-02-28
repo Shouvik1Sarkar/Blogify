@@ -99,7 +99,7 @@ export const deletePlayList = asyncHandler(async (req, res) => {
 
   const { playListId } = req.params;
 
-  const playList = await PlayList.find({
+  const playList = await PlayList.findOne({
     createdBy: user._id,
     _id: playListId,
   });
@@ -108,12 +108,10 @@ export const deletePlayList = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Not Found");
   }
 
-  await Blog.updateMany({
-    playList: playListId,
-    $set: {
-      playList: null,
-    },
-  });
+  await Blog.updateMany(
+    { playList: playListId }, // filter
+    { $set: { playList: null } },
+  );
   await playList.deleteOne();
 
   return res.status(200).json(new ApiResponse(200, null, "Deleted"));
