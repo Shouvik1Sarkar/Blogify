@@ -6,6 +6,7 @@ import { available_roles } from "../utils/constants.utils.js";
 import Comments from "../models/comments.models.js";
 import PlayList from "../models/playList.models.js";
 import User from "../models/user.models.js";
+import { Tag } from "../models/tags.models.js";
 
 export const createBlog = asyncHandler(async (req, res) => {
   const user = req.user;
@@ -14,7 +15,7 @@ export const createBlog = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Unauthorized");
   }
 
-  const { title, content, description } = req.body;
+  const { title, content, description, tags } = req.body;
   const { playListId } = req.params;
   let playList = null;
   if (playListId) {
@@ -28,12 +29,16 @@ export const createBlog = asyncHandler(async (req, res) => {
     }
   }
 
+  // const tag = await Tag.create({
+  //   name: tags,
+  // });
   const createsBlog = await Blog.create({
     title,
     description,
     content,
     createdBy: user._id,
     playList: playList?._id ?? undefined,
+    tags: tags ?? [],
   });
 
   if (!createsBlog) {

@@ -23,6 +23,7 @@ import likesRoutes from "./routes/likes.routes.js";
 import playListRouter from "./routes/playList.routes.js";
 import followRouter from "./routes/follow.routes.js";
 import bookmarkRouter from "./routes/bookmark.routes.js";
+import tagRouter from "./routes/tag.routes.js";
 
 const app = express();
 
@@ -61,6 +62,7 @@ app.use("/api/v1/like/", likesRoutes);
 app.use("/api/v1/playList/", playListRouter);
 app.use("/api/v1/follow/", followRouter);
 app.use("/api/v1/bookmark/", bookmarkRouter);
+app.use("/api/v1/findTag/", tagRouter);
 
 app.use(globalError);
 
